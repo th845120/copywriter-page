@@ -641,6 +641,15 @@
       font-size: 11px; color: rgba(0,0,0,0.45);
       font-family: 'General Sans', sans-serif; white-space: nowrap;
     }
+    .tts-copyright {
+      font-size: 11px; color: #cc2200;
+      font-family: 'General Sans', 'PingFang TC', sans-serif;
+      margin-top: 10px; line-height: 1.5;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .tts-copyright.show { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
@@ -1025,7 +1034,12 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
             <div class="tts-progress-bar" id="tts-prog"></div>
           </div>
           <span class="tts-time" id="tts-time">0:00</span>
-        </div>`;
+        </div>
+        <p class="tts-copyright" id="tts-copyright">＊此為武敬凱老師的聲音，僅供參考，請勿任意使用或散布。</p>`;
+      setTimeout(() => {
+        const c = document.getElementById('tts-copyright');
+        if (c) c.classList.add('show');
+      }, 300);
 
       const pp = document.getElementById('tts-pp');
       const prog = document.getElementById('tts-prog');
