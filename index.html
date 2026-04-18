@@ -1046,7 +1046,7 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       const sections = ['hero-section', 'steps-section', 'form-section'];
       let current = 0;
       let locked = false;
-      const LOCK_MS = 1200;
+      const LOCK_MS = 800;
 
       window.goToPage = function(idx) { goTo(idx); };
       window.setCurrentPage = function(idx) { current = idx; locked = false; };
@@ -1118,7 +1118,7 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
             if (wheelAccum > 0) goTo(current + 1);
             else if (wheelAccum < 0) goTo(current - 1);
             wheelAccum = 0;
-          }, 50);
+          }, 16);
         } else {
           // Page 3: free scroll, only catch upward at top
           if (e.deltaY < 0 && isAtTopOfForm()) {
