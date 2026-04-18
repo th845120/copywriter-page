@@ -28,6 +28,72 @@
       font-size: 17px; line-height: 1.6;
       color: var(--black); background: var(--white); min-height: 100dvh;
     }
+
+    /* ── Intro overlay ── */
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #f5f2eb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      pointer-events: all;
+    }
+    #intro-overlay.fade-out {
+      animation: introFadeOut 0.7s cubic-bezier(0.76,0,0.24,1) 0.2s both;
+    }
+    @keyframes introFadeOut {
+      from { opacity: 1; transform: none; }
+      to   { opacity: 0; transform: translateY(-6px); }
+    }
+    .intro-text {
+      font-family: 'Cabinet Grotesk', 'PingFang TC', sans-serif;
+      font-weight: 800;
+      font-size: clamp(52px, 10vw, 120px);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      color: #1D1D1F;
+      text-align: center;
+      white-space: nowrap;
+      transform-origin: center center;
+      /* start squished */
+      animation: introExpand 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+    }
+    @keyframes introExpand {
+      0%   { transform: scaleY(0.06); opacity: 0.4; }
+      60%  { transform: scaleY(1.04); opacity: 1; }
+      100% { transform: scaleY(1);    opacity: 1; }
+    }
+    .intro-subtitle {
+      font-family: 'General Sans', sans-serif;
+      font-size: clamp(11px, 1.2vw, 14px);
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.38);
+      animation: introFadeIn 0.6s ease 0.8s both;
+    }
+    @keyframes introFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* Venn loader */
+    .intro-loader {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: introFadeIn 0.4s ease 0.3s both;
+    }
+    .intro-loader svg {
+      animation: loaderSpin 2s linear infinite;
+    }
+    @keyframes loaderSpin {
+      to { transform: rotate(360deg); }
+    }
     h1,h2,h3 {
       font-family: 'Cabinet Grotesk', 'PingFang TC', sans-serif;
       font-weight: 800; line-height: 1.08; letter-spacing: -0.03em;
@@ -296,6 +362,19 @@
 </head>
 <body>
 
+  <!-- Intro overlay -->
+  <div id="intro-overlay">
+    <div class="intro-text">廣告旁白<br>一鍵生成</div>
+    <div class="intro-subtitle">AI 廣告文案工具 &nbsp;&bull;&nbsp; 武敬凱 JING WU</div>
+    <!-- Venn loader -->
+    <div class="intro-loader">
+      <svg width="36" height="22" viewBox="0 0 36 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="11" cy="11" r="10" stroke="#1D1D1F" stroke-width="1.2" fill="none" opacity="0.5"/>
+        <circle cx="25" cy="11" r="10" stroke="#1D1D1F" stroke-width="1.2" fill="none" opacity="0.5"/>
+      </svg>
+    </div>
+  </div>
+
   <!-- Nav -->
   <nav class="nav">
     <div class="nav-inner">
@@ -545,6 +624,22 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
     function escHtml(str) {
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
+  </script>
+
+  <!-- Intro JS -->
+  <script>
+    (function() {
+      var overlay = document.getElementById('intro-overlay');
+      if (!overlay) return;
+      // After 1.9s total (0.1 delay + 0.9 expand + 0.9 hold) start fade out
+      setTimeout(function() {
+        overlay.classList.add('fade-out');
+        // Remove from DOM after fade completes
+        setTimeout(function() {
+          overlay.style.display = 'none';
+        }, 900);
+      }, 1900);
+    })();
   </script>
 
   <!-- Visual FX: blob parallax + char color + marquee dup -->
