@@ -156,17 +156,60 @@
     }
 
     /* ── Buttons ── */
-    .btn-blue {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--blue); color: white;
-      font-size: 15px; font-weight: 500;
-      padding: 10px 22px; border-radius: 980px; border: none;
-      cursor: pointer; transition: background 0.2s, transform 0.15s;
-      font-family: 'General Sans', sans-serif; text-decoration: none; white-space: nowrap;
+    .btn-copy {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(0,0,0,0.82); color: rgba(255,255,255,0.92);
+      font-size: 13px; font-weight: 600;
+      padding: 9px 20px; border-radius: 980px; border: none;
+      cursor: pointer;
+      font-family: 'General Sans', sans-serif; white-space: nowrap;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative; overflow: hidden;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
     }
-    .btn-blue:hover { background: var(--blue-hover); transform: scale(1.02); }
-    .btn-blue:active { transform: scale(0.98); }
-    .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-copy:hover {
+      background: rgba(0,0,0,0.95);
+      transform: scale(1.04);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .btn-copy:active { transform: scale(0.97); }
+    .btn-copy .copy-label {
+      display: inline-block;
+      transition: opacity 0.15s, transform 0.2s;
+    }
+    .btn-copy.copied .copy-label { opacity: 0; transform: translateY(-8px); }
+    .btn-copy .copy-done {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, 8px);
+      opacity: 0;
+      transition: opacity 0.15s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .btn-copy.copied .copy-done { opacity: 1; transform: translate(-50%, -50%); }
+    /* particle burst */
+    .copy-particle {
+      position: fixed; pointer-events: none; border-radius: 50%;
+      width: 6px; height: 6px;
+      animation: copyBurst 0.55s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    @keyframes copyBurst {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: var(--tx) scale(0); }
+    }
+    /* toast */
+    #copy-toast {
+      position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: rgba(0,0,0,0.85); color: #fff;
+      font-size: 13px; font-weight: 600; letter-spacing: 0.05em;
+      padding: 12px 28px; border-radius: 980px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      font-family: 'General Sans', sans-serif;
+      pointer-events: none; z-index: 9999;
+      opacity: 0; transition: opacity 0.25s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* ── Hero (fullscreen ocean canvas) ── */
     .hero {
@@ -432,10 +475,17 @@
       background: #ffffff;
       border: 1px solid rgba(0,0,0,0.07);
       border-radius: 20px; padding: 32px 36px; margin-bottom: 16px;
-      transition: box-shadow 0.25s, border-color 0.25s;
+      transition: box-shadow 0.25s, border-color 0.25s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
       box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      cursor: default;
+    }
+    .form-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border-color: rgba(180,140,0,0.2);
     }
     .form-card:focus-within {
+      transform: translateY(-3px);
       box-shadow: 0 0 0 2px rgba(180,140,0,0.3), 0 8px 32px rgba(0,0,0,0.08);
       border-color: rgba(180,140,0,0.35);
     }
@@ -796,21 +846,48 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
         <div class="result-box">
           <div class="result-header">
             <span class="result-eyebrow">✦ 生成結果</span>
-            <button class="btn-blue" onclick="copyResult(this, ${JSON.stringify(text).replace(/"/g,'&quot;')})" style="padding:8px 16px;font-size:13px">
-              複製旁白
+            <button class="btn-copy" onclick="copyResult(this, ${JSON.stringify(text).replace(/"/g,'&quot;')})">
+              <span class="copy-label">複製旁白</span>
+              <span class="copy-done">✓ 已複製</span>
             </button>
           </div>
           <p class="result-text">${escHtml(text)}</p>
           <p class="result-meta">約 ${charCount} 字</p>
         </div>
       `;
+      // 自動複製並顯示 toast
+      navigator.clipboard.writeText(text).then(() => {
+        showCopyToast();
+      });
       setTimeout(() => area.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    function showCopyToast() {
+      const toast = document.getElementById('copy-toast');
+      if (!toast) return;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
     function copyResult(btn, text) {
       navigator.clipboard.writeText(text);
-      btn.textContent = '✓ 已複製';
-      setTimeout(() => { btn.textContent = '複製旁白'; }, 2000);
+      // particle burst
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const colors = ['#1D1D1F','#555','#888','#bbb','#FFCC00'];
+      for (let i = 0; i < 10; i++) {
+        const p = document.createElement('div');
+        p.className = 'copy-particle';
+        const angle = (i / 10) * Math.PI * 2;
+        const dist = 30 + Math.random() * 30;
+        const tx = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+        p.style.cssText = `left:${cx-3}px;top:${cy-3}px;background:${colors[i%colors.length]};--tx:${tx}`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 600);
+      }
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 2000);
     }
 
     function escHtml(str) {
@@ -1173,5 +1250,6 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       });
     })();
   </script>
+  <div id="copy-toast">✦ 文案已複製</div>
 </body>
 </html>
