@@ -1052,11 +1052,14 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       window.setCurrentPage = function(idx) { current = idx; locked = false; };
 
       function smoothScrollTo(targetY, duration, cb) {
+        // Lock overflow to kill Safari momentum scroll during animation
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+
         const startY = window.scrollY;
         const dist = targetY - startY;
         let startTime = null;
         function ease(t) {
-          // easeInOutCubic
           return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
         }
         function step(ts) {
@@ -1067,6 +1070,9 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
           if (progress < 1) {
             requestAnimationFrame(step);
           } else {
+            window.scrollTo(0, targetY);
+            document.documentElement.style.overflow = '';
+            document.body.style.overflow = '';
             if (cb) cb();
           }
         }
@@ -1081,8 +1087,11 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
         const target = document.getElementById(sections[idx]);
         if (!target) return;
         smoothScrollTo(target.offsetTop, 750, () => { locked = false; });
-        // fallback unlock
-        setTimeout(() => { locked = false; }, LOCK_MS);
+        setTimeout(() => {
+          locked = false;
+          document.documentElement.style.overflow = '';
+          document.body.style.overflow = '';
+        }, LOCK_MS);
       }
 
       function isAtTopOfForm() {
