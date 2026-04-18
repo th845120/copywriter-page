@@ -80,19 +80,41 @@
       from { opacity: 0; transform: translateY(6px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    /* Venn loader */
+    /* Progress bar loader */
     .intro-loader {
       position: absolute;
       bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
+      width: clamp(160px, 30vw, 280px);
       animation: introFadeIn 0.4s ease 0.3s both;
     }
-    .intro-loader svg {
-      animation: loaderSpin 2s linear infinite;
+    .intro-progress-track {
+      width: 100%;
+      height: 1.5px;
+      background: rgba(0,0,0,0.12);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 8px;
     }
-    @keyframes loaderSpin {
-      to { transform: rotate(360deg); }
+    .intro-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #1D1D1F;
+      border-radius: 2px;
+      animation: progressFill 1.8s cubic-bezier(0.4,0,0.2,1) 0.3s forwards;
+    }
+    @keyframes progressFill {
+      0%   { width: 0%; }
+      100% { width: 100%; }
+    }
+    .intro-progress-label {
+      font-family: 'General Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: rgba(0,0,0,0.35);
+      text-align: right;
+      animation: countUp 1.8s linear 0.3s forwards;
     }
     h1,h2,h3 {
       font-family: 'Cabinet Grotesk', 'PingFang TC', sans-serif;
@@ -385,12 +407,12 @@
   <div id="intro-overlay">
     <div class="intro-text">廣告旁白<br>一鍵生成</div>
     <div class="intro-subtitle">AI 廣告文案工具 &nbsp;&bull;&nbsp; 武敬凱 JING WU</div>
-    <!-- Venn loader -->
+    <!-- Progress bar -->
     <div class="intro-loader">
-      <svg width="36" height="22" viewBox="0 0 36 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="11" cy="11" r="10" stroke="#1D1D1F" stroke-width="1.2" fill="none" opacity="0.5"/>
-        <circle cx="25" cy="11" r="10" stroke="#1D1D1F" stroke-width="1.2" fill="none" opacity="0.5"/>
-      </svg>
+      <div class="intro-progress-track">
+        <div class="intro-progress-bar" id="intro-bar"></div>
+      </div>
+      <div class="intro-progress-label" id="intro-pct">0%</div>
     </div>
   </div>
 
@@ -653,15 +675,35 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
   <script>
     (function() {
       var overlay = document.getElementById('intro-overlay');
+      var pct = document.getElementById('intro-pct');
       if (!overlay) return;
-      // After 1.9s total (0.1 delay + 0.9 expand + 0.9 hold) start fade out
+
+      // Count 0 → 100 over 1.8s (matches CSS animation)
+      var start = null;
+      var duration = 1800;
+      var delay = 300;
+
       setTimeout(function() {
-        overlay.classList.add('fade-out');
-        // Remove from DOM after fade completes
-        setTimeout(function() {
-          overlay.style.display = 'none';
-        }, 900);
-      }, 1900);
+        function step(ts) {
+          if (!start) start = ts;
+          var prog = Math.min((ts - start) / duration, 1);
+          var val = Math.floor(prog * 100);
+          if (pct) pct.textContent = val + '%';
+          if (prog < 1) {
+            requestAnimationFrame(step);
+          } else {
+            if (pct) pct.textContent = '100%';
+            // fade out after brief pause at 100%
+            setTimeout(function() {
+              overlay.classList.add('fade-out');
+              setTimeout(function() {
+                overlay.style.display = 'none';
+              }, 900);
+            }, 200);
+          }
+        }
+        requestAnimationFrame(step);
+      }, delay);
     })();
   </script>
 
