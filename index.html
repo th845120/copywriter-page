@@ -75,21 +75,33 @@
       background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(255,255,255,0.35) 0%, transparent 70%);
       pointer-events: none;
     }
-    /* floating blob */
+    /* floating 3D ball */
     .hero-blob {
       position: absolute;
-      width: clamp(320px, 55vw, 600px);
-      height: clamp(320px, 55vw, 600px);
+      width: clamp(180px, 22vw, 280px);
+      height: clamp(180px, 22vw, 280px);
       border-radius: 50%;
-      background: radial-gradient(circle at 38% 38%, #ffe08a 0%, #ffc0cb 35%, #d4a0f0 60%, #a0c4ff 80%, transparent 100%);
-      filter: blur(48px);
-      opacity: 0.75;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
+      /* 3D sphere: bright highlight top-left, dark shadow bottom-right */
+      background:
+        radial-gradient(circle at 32% 28%,
+          rgba(255,255,255,0.92) 0%,
+          rgba(255,220,80,0.88)  18%,
+          rgba(255,160,100,0.80) 36%,
+          rgba(200,100,220,0.70) 56%,
+          rgba(80,120,255,0.60)  74%,
+          rgba(20,20,40,0.55)    100%
+        );
+      box-shadow:
+        inset -18px -18px 40px rgba(0,0,0,0.25),
+        inset  8px  8px 20px rgba(255,255,255,0.45),
+        0 20px 60px rgba(0,0,0,0.18);
+      /* position: right side, vertically centered, outside text flow */
+      top: 50%;
+      right: clamp(24px, 7vw, 120px);
+      transform: translateY(-50%);
       pointer-events: none;
       will-change: transform;
-      transition: transform 0.12s ease-out;
-      z-index: 0;
+      z-index: 2;
     }
     .hero-eyebrow {
       display: inline-block; font-size: 13px; font-weight: 600;
@@ -555,7 +567,7 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       function tick() {
         bx = lerp(bx, tx, 0.07);
         by = lerp(by, ty, 0.07);
-        blob.style.transform = `translate(calc(-50% + ${bx}px), calc(-50% + ${by}px))`;
+        blob.style.transform = `translateY(calc(-50% + ${by}px)) translateX(${bx}px)`;
         requestAnimationFrame(tick);
       }
       tick();
