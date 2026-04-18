@@ -818,6 +818,10 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
   <!-- Intro JS -->
   <script>
     (function() {
+      // 強制瀏覽器不恢復滾動位置，並立即回到頂部
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      window.scrollTo(0, 0);
+
       var overlay = document.getElementById('intro-overlay');
       var pct = document.getElementById('intro-pct');
       if (!overlay) return;
@@ -841,7 +845,9 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
             setTimeout(function() {
               overlay.classList.add('fade-out');
               setTimeout(function() {
+                window.scrollTo({ top: 0, behavior: 'instant' });
                 overlay.style.display = 'none';
+                if (typeof window.goToPage === 'function') window.goToPage(0);
               }, 900);
             }, 200);
           }
