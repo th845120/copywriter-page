@@ -270,8 +270,14 @@
     }
 
     /* ── Steps ── */
-    .steps-section { background: var(--gray-light); padding: 80px 24px; }
-    .steps-inner { max-width: 860px; margin: 0 auto; text-align: center; }
+    .steps-section {
+      background: var(--gray-light);
+      padding: 80px 24px;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+    }
+    .steps-inner { max-width: 860px; margin: 0 auto; text-align: center; width: 100%; }
     .eyebrow {
       font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--blue);
@@ -463,7 +469,7 @@
   <section class="steps-section">
     <div class="steps-inner">
       <p class="eyebrow">使用步驟</p>
-      <h2 class="section-title">三個步驟，搞定一篇文案</h2>
+      <h2 class="section-title">3個步驟，搞定一篇文案</h2>
       <div class="steps-grid">
         <div class="step-card">
           <div class="step-num">01</div>
