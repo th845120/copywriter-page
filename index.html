@@ -435,7 +435,6 @@
   <section class="hero" id="hero-section">
     <canvas id="ocean-canvas"></canvas>
     <div class="hero-content">
-      <span class="hero-eyebrow">AI 廣告文案工具</span>
       <h1 id="hero-title">廣告旁白<br>一鍵生成</h1>
     </div>
     <div class="hero-scroll-hint">
@@ -769,80 +768,94 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       loop();
     })();
 
-    // ── Tech orb: floats ABOVE h1, mouse parallax ──
+    // ── Tech orb: top-right corner, mouse parallax ──
     (function() {
       const hero = document.getElementById('hero-section');
-      const content = hero ? hero.querySelector('.hero-content') : null;
-      if (!content) return;
-
-      // Create orb element inside hero-content, before eyebrow
-      const orb = document.createElement('div');
-      orb.id = 'tech-orb';
-      orb.style.cssText = [
-        'width:clamp(90px,12vw,160px)',
-        'height:clamp(90px,12vw,160px)',
-        'border-radius:50%',
-        'margin-bottom:28px',
-        'flex-shrink:0',
-        'pointer-events:none',
-        'will-change:transform',
-        'position:relative',
-        // core: semi-transparent tinted sphere
-        'background:radial-gradient(circle at 38% 32%, rgba(255,255,255,0.55) 0%, rgba(120,200,255,0.35) 30%, rgba(60,140,255,0.18) 60%, rgba(0,60,160,0.12) 100%)',
-        'box-shadow:0 0 40px 18px rgba(80,180,255,0.45), 0 0 80px 36px rgba(60,120,255,0.22), inset 0 0 20px 6px rgba(255,255,255,0.18)',
-        'border:1px solid rgba(180,220,255,0.35)',
-      ].join(';');
-
-      // Pulsing outer glow ring via pseudo — use a wrapper instead
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:28px;';
-      const ring = document.createElement('div');
-      ring.style.cssText = [
-        'position:absolute',
-        'border-radius:50%',
-        'width:calc(100% + 40px)',
-        'height:calc(100% + 40px)',
-        'border:1.5px solid rgba(120,200,255,0.3)',
-        'animation:orbRing 3s ease-in-out infinite',
-        'pointer-events:none',
-      ].join(';');
-      const ring2 = ring.cloneNode();
-      ring2.style.cssText = ring.style.cssText.replace('orbRing 3s', 'orbRing 3s').replace('width:calc(100% + 40px)', 'width:calc(100% + 72px)').replace('height:calc(100% + 40px)', 'height:calc(100% + 72px)').replace('rgba(120,200,255,0.3)', 'rgba(120,200,255,0.15)').replace('animation:orbRing 3s ease-in-out infinite', 'animation:orbRing 3s ease-in-out 0.4s infinite');
-      orb.style.removeProperty('margin-bottom');
-      wrapper.appendChild(ring);
-      wrapper.appendChild(ring2);
-      wrapper.appendChild(orb);
+      if (!hero) return;
 
       // Inject keyframes
       if (!document.getElementById('orb-style')) {
         const s = document.createElement('style');
         s.id = 'orb-style';
         s.textContent = `
-          @keyframes orbRing {
-            0%,100% { transform:scale(1);   opacity:0.6; }
-            50%      { transform:scale(1.12); opacity:0.2; }
+          #orb-wrapper {
+            position: absolute;
+            top: clamp(16px, 5vw, 60px);
+            right: clamp(16px, 5vw, 80px);
+            z-index: 3;
+            pointer-events: none;
+            will-change: transform;
           }
           #tech-orb {
+            width: clamp(120px, 16vw, 220px);
+            height: clamp(120px, 16vw, 220px);
+            border-radius: 50%;
+            background: radial-gradient(circle at 38% 30%,
+              rgba(255,255,255,0.95) 0%,
+              rgba(255,210,100,0.9)  18%,
+              rgba(255,140,120,0.8)  40%,
+              rgba(200,140,210,0.7)  65%,
+              rgba(160,160,200,0.55) 85%,
+              rgba(100,100,140,0.4)  100%
+            );
+            box-shadow:
+              inset -10px -10px 30px rgba(0,0,0,0.15),
+              inset  6px  6px 16px rgba(255,255,255,0.5),
+              0 0 40px 16px rgba(255,180,100,0.35),
+              0 0 80px 36px rgba(255,150,150,0.18),
+              0 16px 48px rgba(0,0,0,0.12);
             animation: orbFloat 5s ease-in-out infinite;
+            position: relative;
           }
           @keyframes orbFloat {
-            0%,100% { transform:translateY(0); }
-            50%      { transform:translateY(-10px); }
+            0%,100% { transform:translateY(0px); }
+            50%      { transform:translateY(-12px); }
+          }
+          .orb-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255,180,120,0.25);
+            pointer-events: none;
+          }
+          .orb-ring-1 {
+            width: calc(100% + 32px); height: calc(100% + 32px);
+            top: -16px; left: -16px;
+            animation: orbRing 3.5s ease-in-out infinite;
+          }
+          .orb-ring-2 {
+            width: calc(100% + 64px); height: calc(100% + 64px);
+            top: -32px; left: -32px;
+            animation: orbRing 3.5s ease-in-out 0.5s infinite;
+            border-color: rgba(255,180,120,0.12);
+          }
+          @keyframes orbRing {
+            0%,100% { transform:scale(1);    opacity:0.7; }
+            50%      { transform:scale(1.08); opacity:0.2; }
           }
         `;
         document.head.appendChild(s);
       }
 
-      // Insert wrapper before eyebrow
-      content.insertBefore(wrapper, content.firstChild);
+      // Build DOM
+      const wrapper = document.createElement('div');
+      wrapper.id = 'orb-wrapper';
+      const ring1 = document.createElement('div');
+      ring1.className = 'orb-ring orb-ring-1';
+      const ring2 = document.createElement('div');
+      ring2.className = 'orb-ring orb-ring-2';
+      const orb = document.createElement('div');
+      orb.id = 'tech-orb';
+      wrapper.appendChild(ring1);
+      wrapper.appendChild(ring2);
+      wrapper.appendChild(orb);
+      hero.appendChild(wrapper);
 
       // Mouse parallax
       let bx = 0, by = 0, tx = 0, ty = 0;
       document.addEventListener('mousemove', function(e) {
-        if (!hero) return;
         const rect = hero.getBoundingClientRect();
-        tx = ((e.clientX - rect.left) / rect.width  - 0.5) * 28;
-        ty = ((e.clientY - rect.top)  / rect.height - 0.5) * 20;
+        tx = ((e.clientX - rect.left) / rect.width  - 0.5) * 24;
+        ty = ((e.clientY - rect.top)  / rect.height - 0.5) * 18;
       });
       function lerp(a, b, t) { return a + (b - a) * t; }
       (function tick() {
