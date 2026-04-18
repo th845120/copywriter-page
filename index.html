@@ -244,6 +244,34 @@
       color: rgba(0,0,0,0.5);
       font-family: 'General Sans', sans-serif;
     }
+
+    .steps-scroll-hint {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.45;
+      animation: hintBobDark 2s ease-in-out infinite;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .steps-scroll-hint:hover { opacity: 0.9; }
+    .steps-scroll-hint span {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      font-family: 'General Sans', sans-serif;
+    }
+    @keyframes hintBobDark {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(6px); }
+    }
     @keyframes hintBob {
       0%,100% { transform: translateX(-50%) translateY(0); }
       50%      { transform: translateX(-50%) translateY(6px); }
@@ -586,6 +614,10 @@
           <p class="step-desc">給我0.1首歌的時間，我會幫你生成288個字左右的文案，拍成影片差不多1分鐘，把寫文案省下來的時間去喝下午茶吧！</p>
         </div>
       </div>
+    </div>
+    <div class="steps-scroll-hint" onclick="goToPage(2)">
+      <span>開始填寫</span>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M4 11l5 5 5-5" stroke="rgba(255,255,255,0.7)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
   </section>
 
@@ -1009,6 +1041,7 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       let isScrolling = false;
       const LOCK_MS = 900; // cooldown between page jumps
 
+      window.goToPage = function(idx) { goTo(idx); };
       function goTo(idx) {
         if (idx < 0 || idx >= sections.length) return;
         current = idx;
