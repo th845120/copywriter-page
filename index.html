@@ -223,11 +223,18 @@
     }
     .hero-marquee-track span {
       font-size: clamp(14px, 2vw, 20px);
-      font-weight: 700;
+      font-weight: 800;
+      font-style: italic;
       font-family: 'Cabinet Grotesk', sans-serif;
       color: var(--yellow);
       letter-spacing: 0.04em;
-      padding-right: 80px;
+      padding-right: 0;
+    }
+    .hero-marquee-track span::after {
+      content: ' / ';
+      font-style: normal;
+      color: rgba(255,204,0,0.5);
+      padding: 0 20px;
     }
     @keyframes marqueeScroll {
       from { transform: translateX(0); }
@@ -419,7 +426,7 @@
   <!-- Marquee -->
   <div class="hero-marquee-wrap">
     <div class="hero-marquee-track" id="marquee-track">
-      <span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span>
+      <span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span><span>有了我，誰還自己寫文案？</span>
     </div>
   </div>
 
