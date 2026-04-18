@@ -659,17 +659,17 @@
         <p class="field-desc">貼上你過去寫過的文案 — AI 會分析你的語氣、句型結構，仿寫新品旁白。</p>
         <div class="sample-group">
           <span class="sub-label">範本文案 1 <span class="req">*</span></span>
-          <textarea id="sample1" rows="5" placeholder="貼上範本文案 1…"></textarea>
+          <textarea id="sample1" rows="5" placeholder="貼上範本文案 1…" maxlength="1688"></textarea>
           <div class="char-count" id="count1">0 字</div>
         </div>
         <div class="sample-group">
           <span class="sub-label">範本文案 2 <span class="req">*</span></span>
-          <textarea id="sample2" rows="5" placeholder="貼上範本文案 2…"></textarea>
+          <textarea id="sample2" rows="5" placeholder="貼上範本文案 2…" maxlength="1688"></textarea>
           <div class="char-count" id="count2">0 字</div>
         </div>
         <div class="sample-group">
           <span class="sub-label">範本文案 3</span>
-          <textarea id="sample3" rows="5" placeholder="貼上範本文案 3…（選填）"></textarea>
+          <textarea id="sample3" rows="5" placeholder="貼上範本文案 3…（選填）" maxlength="1688"></textarea>
           <div class="char-count" id="count3">0 字</div>
         </div>
       </div>
@@ -710,7 +710,10 @@
 
     ['sample1','sample2','sample3'].forEach((id, i) => {
       document.getElementById(id).addEventListener('input', function() {
-        document.getElementById('count' + (i+1)).textContent = this.value.length + ' 字';
+        const len = this.value.length;
+        const el = document.getElementById('count' + (i+1));
+        el.textContent = len + ' / 1688 字';
+        el.style.color = len >= 1688 ? '#cc4400' : '';
       });
     });
 
