@@ -580,7 +580,7 @@
     <div class="hero-content">
       <h1 id="hero-title">廣告旁白<br>一鍵生成</h1>
     </div>
-    <div class="hero-scroll-hint" onclick="document.querySelector('.steps-section').scrollIntoView({behavior:'smooth'})">
+    <div class="hero-scroll-hint" onclick="goToPage(1)">
       <span>Scroll to begin</span>
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M4 11l5 5 5-5" stroke="rgba(0,0,0,0.5)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -1051,22 +1051,27 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       window.goToPage = function(idx) { goTo(idx); };
       window.setCurrentPage = function(idx) { current = idx; locked = false; };
 
-      function smoothScrollTo(targetY, duration, cb) {
+      function smoothScrollTo(targetY, cb) {
         // Lock overflow to kill Safari momentum scroll during animation
         document.documentElement.style.overflow = 'hidden';
         document.body.style.overflow = 'hidden';
 
         const startY = window.scrollY;
-        const dist = targetY - startY;
+        const dist = Math.abs(targetY - startY);
+        // Fixed speed: 1 viewport height = 700ms, clamped 500–900ms
+        const vh = window.innerHeight || 800;
+        const duration = Math.min(Math.max(dist / vh * 700, 500), 900);
+
         let startTime = null;
         function ease(t) {
           return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
         }
+        const totalDist = targetY - startY;
         function step(ts) {
           if (!startTime) startTime = ts;
           const elapsed = ts - startTime;
           const progress = Math.min(elapsed / duration, 1);
-          window.scrollTo(0, startY + dist * ease(progress));
+          window.scrollTo(0, startY + totalDist * ease(progress));
           if (progress < 1) {
             requestAnimationFrame(step);
           } else {
@@ -1086,7 +1091,7 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
         locked = true;
         const target = document.getElementById(sections[idx]);
         if (!target) return;
-        smoothScrollTo(target.offsetTop, 750, () => { locked = false; });
+        smoothScrollTo(target.offsetTop, () => { locked = false; });
         setTimeout(() => {
           locked = false;
           document.documentElement.style.overflow = '';
