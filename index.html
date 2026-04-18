@@ -360,7 +360,7 @@
     /* ── Form section ── */
     .form-section {
       min-height: 100dvh;
-      background: #0d0d0d;
+      background: #f5f2eb;
       padding: 0 24px 100px;
       position: relative;
     }
@@ -368,7 +368,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,204,0,0.07) 0%, transparent 60%);
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,204,0,0.18) 0%, transparent 55%);
       pointer-events: none;
     }
     .form-page-header {
@@ -379,64 +379,62 @@
     }
     .form-page-eyebrow {
       font-size: 11px; font-weight: 700; letter-spacing: 0.25em;
-      text-transform: uppercase; color: var(--yellow);
+      text-transform: uppercase; color: #a07800;
       margin-bottom: 20px; font-family: 'General Sans', sans-serif;
-      opacity: 0.8;
     }
     .form-page-title {
       font-family: 'Cabinet Grotesk', sans-serif;
       font-size: clamp(48px, 7vw, 96px);
       font-weight: 800;
-      color: #ffffff;
+      color: #1D1D1F;
       letter-spacing: -0.04em;
       line-height: 1;
       margin: 0;
     }
-    .form-page-title span { color: var(--yellow); }
+    .form-page-title span { color: #b38a00; }
     .form-page-sub {
       font-size: clamp(16px, 2vw, 20px);
-      color: rgba(255,255,255,0.4);
+      color: rgba(0,0,0,0.4);
       margin-top: 16px;
       font-family: 'General Sans', sans-serif;
       font-weight: 400;
     }
     .form-inner { max-width: 780px; margin: 0 auto; position: relative; z-index: 1; }
     .form-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.07);
       border-radius: 20px; padding: 32px 36px; margin-bottom: 16px;
-      transition: box-shadow 0.25s, border-color 0.25s, background 0.25s;
-      backdrop-filter: blur(8px);
+      transition: box-shadow 0.25s, border-color 0.25s;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
     }
     .form-card:focus-within {
-      background: rgba(255,255,255,0.07);
-      box-shadow: 0 0 0 2px rgba(255,204,0,0.25), 0 20px 60px rgba(0,0,0,0.4);
-      border-color: rgba(255,204,0,0.3);
+      box-shadow: 0 0 0 2px rgba(180,140,0,0.3), 0 8px 32px rgba(0,0,0,0.08);
+      border-color: rgba(180,140,0,0.35);
     }
     .field-label {
       display: block; font-size: 12px; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
-      color: rgba(255,255,255,0.5); margin-bottom: 12px;
+      color: #888; margin-bottom: 12px;
       font-family: 'General Sans', sans-serif;
     }
-    .field-label .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: rgba(255,255,255,0.3); font-size: 11px; margin-left: 6px; }
-    .field-label .req { color: var(--yellow); margin-left: 3px; font-size: 13px; }
-    .field-desc { font-size: 14px; color: rgba(255,255,255,0.35); margin-bottom: 20px; line-height: 1.6; }
+    .field-label .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: #bbb; font-size: 11px; margin-left: 6px; }
+    .field-label .req { color: #b38a00; margin-left: 3px; font-size: 13px; }
+    .field-desc { font-size: 14px; color: #888; margin-bottom: 20px; line-height: 1.6; }
 
     input[type="text"], textarea {
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      background: #f7f5f0; border: 1px solid rgba(0,0,0,0.09);
       border-radius: 12px; padding: 14px 16px;
-      font-size: 16px; color: #ffffff; width: 100%;
+      font-size: 16px; color: #1D1D1F; width: 100%;
       transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
       font-family: 'General Sans', 'PingFang TC', sans-serif; outline: none;
     }
     input[type="text"]:focus, textarea:focus {
-      background: rgba(255,255,255,0.1); border-color: rgba(255,204,0,0.5);
-      box-shadow: 0 0 0 3px rgba(255,204,0,0.1);
+      background: #ffffff; border-color: rgba(180,140,0,0.5);
+      box-shadow: 0 0 0 3px rgba(255,204,0,0.15);
     }
-    input[type="text"]::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
+    input[type="text"]::placeholder, textarea::placeholder { color: #c0b89a; }
     textarea { resize: vertical; line-height: 1.55; }
-    .char-count { font-size: 11px; color: rgba(255,255,255,0.25); text-align: right; margin-top: 4px; font-family: 'General Sans', sans-serif; }
+    .char-count { font-size: 11px; color: #bbb; text-align: right; margin-top: 4px; font-family: 'General Sans', sans-serif; }
 
     /* ── Features ── */
     .features-list { display: flex; flex-direction: column; gap: 10px; }
@@ -444,21 +442,20 @@
     .feature-row input { flex: 1; }
     .remove-btn {
       width: 32px; height: 32px; border-radius: 50%;
-      background: rgba(255,255,255,0.08); border: none; cursor: pointer;
-      color: rgba(255,255,255,0.4); flex-shrink: 0;
+      background: #f0ece2; border: none; cursor: pointer;
+      color: #999; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       font-size: 14px; line-height: 1; transition: background 0.15s, color 0.15s;
     }
-    .remove-btn:hover { background: rgba(255,80,80,0.2); color: #ff6b6b; }
+    .remove-btn:hover { background: #ffe0e0; color: #cc0000; }
     .add-btn {
       display: inline-flex; align-items: center; gap: 5px;
-      font-size: 13px; color: var(--yellow); font-weight: 600;
+      font-size: 13px; color: #a07800; font-weight: 600;
       background: none; border: none; cursor: pointer;
       padding: 8px 0; margin-top: 10px;
       font-family: 'General Sans', sans-serif; transition: opacity 0.15s;
-      opacity: 0.75;
     }
-    .add-btn:hover { opacity: 1; }
+    .add-btn:hover { opacity: 0.7; }
 
     /* ── Sample group ── */
     .sample-group { margin-bottom: 20px; }
@@ -466,10 +463,10 @@
     .sub-label {
       display: flex; align-items: center; gap: 4px;
       font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-      text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 8px;
+      text-transform: uppercase; color: #aaa; margin-bottom: 8px;
       font-family: 'General Sans', sans-serif;
     }
-    .sub-label .req { color: var(--yellow); font-size: 13px; }
+    .sub-label .req { color: #b38a00; font-size: 13px; }
 
     /* ── Generate button ── */
     .generate-btn {
