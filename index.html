@@ -101,7 +101,7 @@
       transform: translateX(-50%);
       width: clamp(160px, 30vw, 280px);
       /* 進度條最後：小標出來後才出現 */
-      animation: introFadeIn 0.4s ease 1.7s both;
+      animation: introFadeIn 0.4s ease 0.9s both;
     }
     .intro-progress-track {
       width: 100%;
@@ -117,7 +117,7 @@
       background: #1D1D1F;
       border-radius: 2px;
       /* 進度條也配合延遲 */
-      animation: progressFill 1.8s cubic-bezier(0.4,0,0.2,1) 1.7s forwards;
+      animation: progressFill 1.8s cubic-bezier(0.4,0,0.2,1) 0.9s forwards;
     }
     @keyframes progressFill {
       0%   { width: 0%; }
@@ -829,7 +829,7 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
       // Count 0 → 100 over 1.8s (matches CSS animation)
       var start = null;
       var duration = 1800;
-      var delay = 1700; // 配合 CSS 進度條 delay
+      var delay = 900; // 配合 CSS 進度條 delay
 
       setTimeout(function() {
         function step(ts) {
