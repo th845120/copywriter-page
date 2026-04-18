@@ -1050,12 +1050,37 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
 
       window.goToPage = function(idx) { goTo(idx); };
 
+      function smoothScrollTo(targetY, duration, cb) {
+        const startY = window.scrollY;
+        const dist = targetY - startY;
+        let startTime = null;
+        function ease(t) {
+          // easeInOutCubic
+          return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+        }
+        function step(ts) {
+          if (!startTime) startTime = ts;
+          const elapsed = ts - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          window.scrollTo(0, startY + dist * ease(progress));
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          } else {
+            if (cb) cb();
+          }
+        }
+        requestAnimationFrame(step);
+      }
+
       function goTo(idx) {
         if (idx < 0 || idx >= sections.length) return;
         if (locked) return;
         current = idx;
         locked = true;
-        document.getElementById(sections[idx]).scrollIntoView({ behavior: 'smooth' });
+        const target = document.getElementById(sections[idx]);
+        if (!target) return;
+        smoothScrollTo(target.offsetTop, 750, () => { locked = false; });
+        // fallback unlock
         setTimeout(() => { locked = false; }, LOCK_MS);
       }
 
