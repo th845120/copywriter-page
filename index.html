@@ -1292,6 +1292,18 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
   <script>
     // ── Controlled scroll: page 1↔2 snap, page 3 free scroll ──
     (function () {
+      // 手機版完全跳過，用原生滾動
+      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 768;
+      if (isMobile) {
+        window.goToPage = function(idx) {
+          const ids = ['hero-section','steps-section','form-section'];
+          const el = document.getElementById(ids[idx]);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+        window.setCurrentPage = function() {};
+        return;
+      }
+
       const sections = ['hero-section', 'steps-section', 'form-section'];
       let current = 0;
       let locked = false;
