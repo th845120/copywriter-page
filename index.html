@@ -592,6 +592,55 @@
       .form-card { padding: 24px 20px; }
       .result-box { padding: 28px 24px; }
     }
+
+    /* ── TTS play button ── */
+    .btn-tts {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(0,0,0,0.08);
+      color: rgba(0,0,0,0.75);
+      font-size: 13px; font-weight: 600;
+      padding: 9px 20px; border-radius: 980px; border: none;
+      cursor: pointer;
+      font-family: 'General Sans', sans-serif; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+      position: relative; overflow: hidden;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-tts:hover {
+      background: rgba(0,0,0,0.14);
+      transform: scale(1.04);
+    }
+    .btn-tts:active { transform: scale(0.97); }
+    .btn-tts.loading { opacity: 0.6; cursor: not-allowed; }
+    .btn-tts .tts-icon { font-size: 15px; line-height: 1; }
+    /* audio progress bar inside result-box */
+    .tts-player {
+      margin-top: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .tts-play-pause {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.82); color: #fff;
+      border: none; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      transition: transform 0.15s, background 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .tts-play-pause:hover { transform: scale(1.08); background: #000; }
+    .tts-progress-wrap {
+      flex: 1; height: 4px; background: rgba(0,0,0,0.12);
+      border-radius: 4px; cursor: pointer; position: relative;
+    }
+    .tts-progress-bar {
+      height: 100%; background: rgba(0,0,0,0.6);
+      border-radius: 4px; width: 0%;
+      transition: width 0.1s linear;
+    }
+    .tts-time {
+      font-size: 11px; color: rgba(0,0,0,0.45);
+      font-family: 'General Sans', sans-serif; white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -846,12 +895,18 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
         <div class="result-box">
           <div class="result-header">
             <span class="result-eyebrow">✦ 生成結果</span>
-            <button class="btn-copy" onclick="copyResult(this, ${JSON.stringify(text).replace(/"/g,'&quot;')})">
-              <span class="copy-label">複製旁白</span>
-              <span class="copy-done">✓ 已複製</span>
-            </button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn-tts" id="tts-btn" onclick="speakText(${JSON.stringify(text).replace(/"/g,'&quot;')})">
+                <span class="tts-icon">▶</span> 播放旁白
+              </button>
+              <button class="btn-copy" onclick="copyResult(this, ${JSON.stringify(text).replace(/"/g,'&quot;')})">
+                <span class="copy-label">複製旁白</span>
+                <span class="copy-done">✓ 已複製</span>
+              </button>
+            </div>
           </div>
           <p class="result-text">${escHtml(text)}</p>
+          <div id="tts-player-wrap"></div>
           <p class="result-meta">約 ${charCount} 字</p>
         </div>
       `;
@@ -892,6 +947,106 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
 
     function escHtml(str) {
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── MiniMax TTS ──
+    const _mk = ['sk-api-qSHQGou7XIIqjdSozLpiJdUXxTL2boEyUhxqWuU65Cs-4nke_dkhKo0eosRaWSDVAC36Q4ZKDxeKW-n768t_j_ElOcds3fpNceuzo6fwqspQscU5PYHU7WM'];
+    const MINIMAX_KEY = _mk[0];
+    const MINIMAX_GROUP = '1964207218865742203';
+    const MINIMAX_VOICE = 'moss_audio_990fb898-8b00-11f0-aee7-0efbf552787f';
+    let ttsAudio = null;
+
+    async function speakText(text) {
+      const btn = document.getElementById('tts-btn');
+      if (!btn) return;
+      // stop existing
+      if (ttsAudio) { ttsAudio.pause(); ttsAudio = null; }
+
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btn.innerHTML = '<span class="tts-icon">⏳</span> 生成中…';
+
+      try {
+        const resp = await fetch(
+          `https://api.minimaxi.com/v1/t2a_v2?GroupId=${MINIMAX_GROUP}`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${MINIMAX_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'speech-02-hd',
+              text: text,
+              voice_setting: {
+                voice_id: MINIMAX_VOICE,
+                speed: 1.0,
+                vol: 1.0,
+                pitch: 0
+              },
+              output_format: 'hex'
+            })
+          }
+        );
+        const json = await resp.json();
+        if (!json.data || !json.data.audio) throw new Error(json.base_resp?.status_msg || 'TTS 失敗');
+
+        // hex → ArrayBuffer → Blob → Audio
+        const hex = json.data.audio;
+        const bytes = new Uint8Array(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)));
+        const blob = new Blob([bytes], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+
+        ttsAudio = new Audio(url);
+        renderTTSPlayer(ttsAudio);
+        ttsAudio.play();
+
+        btn.innerHTML = '<span class="tts-icon">🔊</span> 播放中';
+        ttsAudio.onended = () => {
+          btn.disabled = false;
+          btn.classList.remove('loading');
+          btn.innerHTML = '<span class="tts-icon">▶</span> 重播旁白';
+        };
+      } catch (err) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.innerHTML = '<span class="tts-icon">▶</span> 播放旁白';
+        alert('語音生成失敗：' + err.message);
+      }
+    }
+
+    function renderTTSPlayer(audio) {
+      const wrap = document.getElementById('tts-player-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = `
+        <div class="tts-player">
+          <button class="tts-play-pause" id="tts-pp">⏸</button>
+          <div class="tts-progress-wrap" id="tts-prog-wrap">
+            <div class="tts-progress-bar" id="tts-prog"></div>
+          </div>
+          <span class="tts-time" id="tts-time">0:00</span>
+        </div>`;
+
+      const pp = document.getElementById('tts-pp');
+      const prog = document.getElementById('tts-prog');
+      const timeEl = document.getElementById('tts-time');
+
+      pp.onclick = () => {
+        if (audio.paused) { audio.play(); pp.textContent = '⏸'; }
+        else { audio.pause(); pp.textContent = '▶'; }
+      };
+      document.getElementById('tts-prog-wrap').onclick = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+      };
+      audio.ontimeupdate = () => {
+        if (!audio.duration) return;
+        const pct = (audio.currentTime / audio.duration) * 100;
+        prog.style.width = pct + '%';
+        const s = Math.floor(audio.currentTime);
+        timeEl.textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+      };
+      audio.onended = () => { pp.textContent = '▶'; prog.style.width = '100%'; };
     }
   </script>
 
