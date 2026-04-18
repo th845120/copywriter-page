@@ -761,52 +761,9 @@ ${features.map((f, i) => `${i+1}. ${f}`).join('\n')}
         }
       }
 
-      // Sparkles
-      function initSparkles() {
-        sparkles = [];
-        const count = Math.floor(W * H / 4000);
-        for (let i = 0; i < count; i++) {
-          sparkles.push({
-            x: Math.random() * W,
-            y: H * 0.3 + Math.random() * H * 0.7,
-            size: 0.5 + Math.random() * 2.5,
-            life: Math.random() * Math.PI * 2,
-            speed: 0.04 + Math.random() * 0.06,
-            drift: (Math.random() - 0.5) * 0.4
-          });
-        }
-      }
-      initSparkles();
-      window.addEventListener('resize', initSparkles);
-
-      function drawSparkles() {
-        sparkles.forEach(function(s) {
-          s.life += s.speed;
-          s.x += s.drift;
-          if (s.x < 0) s.x = W;
-          if (s.x > W) s.x = 0;
-          const alpha = Math.abs(Math.sin(s.life)) * 0.9;
-          const r = s.size * (0.5 + Math.abs(Math.sin(s.life)) * 0.5);
-          // star cross
-          ctx.save();
-          ctx.globalAlpha = alpha;
-          ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-          ctx.lineWidth = r * 0.7;
-          ctx.lineCap = 'round';
-          ctx.beginPath();
-          ctx.moveTo(s.x - r * 2, s.y);
-          ctx.lineTo(s.x + r * 2, s.y);
-          ctx.moveTo(s.x, s.y - r * 2);
-          ctx.lineTo(s.x, s.y + r * 2);
-          ctx.stroke();
-          ctx.restore();
-        });
-      }
-
       function loop() {
         t += 0.016;
         drawOcean();
-        drawSparkles();
         requestAnimationFrame(loop);
       }
       loop();
